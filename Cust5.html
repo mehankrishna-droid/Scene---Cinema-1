@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Denah Kursi - Cinema 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #111;
+      color: #fff;
+      padding: 10px;
+      margin: 0;
+    }
+    h2 { margin-bottom: 5px; color: #fff; font-size: 24px; }
+    p.subtitle { color: #f1c40f; font-size: 13px; margin-bottom: 20px; }
+    
+    .cinema-container {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+      overflow-x: auto;
+      max-width: 100%;
+      padding: 20px 30px;
+      background: #1a1a1a;
+      border-radius: 8px;
+    }
+    .row { display: flex; align-items: center; gap: 3px; justify-content: center; }
+    .row-label {
+      width: 25px; height: 38px; display: flex; align-items: center;
+      justify-content: center; font-weight: bold; color: #f1c40f; font-size: 14px;
+    }
+    .block { display: flex; gap: 3px; }
+    
+    .kursi {
+      width: 32px; height: 38px; background: #2ecc71; color: #fff;
+      border-radius: 4px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; font-size: 11px;
+      font-weight: bold; user-select: none; box-sizing: border-box; padding: 1px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .kursi:hover { opacity: 0.85; transform: scale(1.05); }
+    .kursi.occupied { background: #e74c3c !important; color: #fff !important; }
+    
+    .kursi-nomor { font-size: 10px; opacity: 0.9; line-height: 11px; margin-bottom: 1px; text-align: center; }
+    .kursi-nama {
+      font-size: 7px; font-weight: 800; line-height: 8px;
+      text-transform: uppercase; text-align: center; word-break: break-word; color: #fff;
+    }
+
+    /* Warna Kategori Khusus */
+    .kursi.extra { background: #1e8449; } 
+    .kursi.comfort { background: #2980b9; }
+
+    .stairs-box {
+      background: #d4ac0d; color: #000; font-weight: bold; font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; width: 67px;
+      align-self: stretch;
+    }
+    
+    .entrance-box {
+      background: #d4ac0d; color: #000; font-weight: bold; font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; width: 65px;
+      align-self: stretch;
+      position: relative;
+      left: -70px;
+    }
+
+    .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px; font-weight: bold; font-size: 10px; }
+    
+    .main-layout { display: flex; gap: 4px; align-items: flex-start; justify-content: center; }
+    .grid-rows { display: flex; flex-direction: column; gap: 4px; }
+
+    .layar {
+      background: #e0e0e0;
+      color: #000;
+      padding: 8px;
+      margin: 20px auto 15px;
+      width: 90%;
+      max-width: 700px;
+      border-radius: 4px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    /* Box Info Rekening BCA Estetik */
+    .rekening-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      border-radius: 12px;
+      padding: 16px 20px;
+      max-width: 420px;
+      margin: 0 auto 20px auto;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 215, 0, 0.15);
+      box-sizing: border-box;
+    }
+    .rekening-header {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 12px; letter-spacing: 1.5px; color: #FFD700; font-weight: 800;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    .rekening-body {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .bca-logo {
+      height: 28px; width: auto; background: #fff; padding: 4px 8px; border-radius: 6px;
+      display: flex; align-items: center;
+    }
+    .bca-logo img { height: 100%; object-fit: contain; }
+    .rekening-detail { text-align: right; }
+    .rekening-number { font-size: 17px; font-weight: 800; color: #ffffff; letter-spacing: 1.5px; font-family: 'Courier New', Courier, monospace; }
+    .rekening-name { font-size: 11px; color: #94a3b8; margin-top: 2px; text-transform: uppercase; }
+
+    .legend {
+      display: flex; justify-content: center; gap: 15px; margin: 15px 0; font-size: 12px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-box { width: 15px; height: 15px; border-radius: 3px; }
+
+    .rekap-container {
+      margin: 25px auto; width: 95%; max-width: 700px; text-align: left; background: #222; padding: 12px; border-radius: 6px; box-sizing: border-box;
+    }
+    .rekap-container h3 { margin-top: 0; color: #f1c40f; text-align: center; }
+
+    .table-wrapper {
+      max-height: 350px; overflow-y: auto; margin-top: 10px; border: 1px solid #444; border-radius: 4px;
+    }
+    table.rekap-table { width: 100%; border-collapse: collapse; background: #111; }
+    table.rekap-table th, table.rekap-table td { border: 1px solid #444; padding: 8px 10px; font-size: 12px; text-align: center; color: #fff; }
+    table.rekap-table th { position: sticky; top: 0; background: #333; color: #f1c40f; z-index: 1; }
+  </style>
+</head>
+<body>
+
+  <h2>CINEMA 1</h2>
+  <p class="subtitle">Klik pada kursi untuk melihat status pemesanan</p>
+
+  <!-- KOTAK REKENING BCA -->
+  <div class="rekening-card">
+    <div class="rekening-header">
+      <span>💳 Rekening Pembayaran</span>
+    </div>
+    <div class="rekening-body">
+      <div class="bca-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA Logo">
+      </div>
+      <div class="rekening-detail">
+        <div class="rekening-number">2291419927</div>
+        <div class="rekening-name">RAWINDREN</div>
+      </div>
+    </div>
+    
+    <!-- DAFTAR HARGA TIKET BARU -->
+    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.15); font-size: 12px; text-align: left; line-height: 1.6;">
+      <div style="font-weight: bold; color: #ffd700; text-align: center; margin-bottom: 6px;">🎟️ Daftar Harga Tiket:</div>
+      <div style="display: flex; justify-content: space-between; color: #00ff00;">
+        <span>🟢 Normal Seat </span>
+        <strong>Rp 125.000 / seat</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; color: #27ae60;">
+        <span>🟢 Extra Seat (Row D)</span>
+        <strong>Rp 150.000 / seat</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; color: #ff0000;">
+        <span>🔴 Reserved Seat (RSV)</span>
+        <strong>Already Booked</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box" style="background: #2ecc71;"></div><span>Tersedia</span></div>
+    <div class="legend-item"><div class="legend-box" style="background: #e74c3c;"></div><span>Terisi</span></div>
+  </div>
+
+  <div class="cinema-container" id="cinema"></div>
+  <div class="layar">SCREEN</div>
+
+  <!-- TABEL REKAP CUSTOMER -->
+  <div class="rekap-container">
+    <h3>Daftar Pemesan Kursi</h3>
+    <div class="table-wrapper">
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">No. Kursi</th>
+            <th>Nama Lengkap Pemesan</th>
+            <th style="width: 35%;">Status Pembayaran</th>
+          </tr>
+        </thead>
+        <tbody id="tabelRekapBody">
+          <tr><td colspan="3" style="text-align: center; color: #aaa;">Belum ada kursi terisi</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvzmVqbOG7vacgDI6NaBuuM3nhKMlGbZ0",
+      authDomain: "bioskop-jailer-2.firebaseapp.com",
+      databaseURL: "https://bioskop-jailer-2-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "bioskop-jailer-2",
+      storageBucket: "bioskop-jailer-2.firebasestorage.app",
+      messagingSenderId: "1069180435262",
+      appId: "1:1069180435262:web:27a2fb0b3d48b84e4e8a6f",
+      measurementId: "G-1SVN8BE69T"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const seatsRef = ref(db, 'cinema1/seats');
+
+    const cinemaContainer = document.getElementById('cinema');
+    const upperRows = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L'];
+    const clRows = ['C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L'];
+
+    function createLabel(text) {
+      const lbl = document.createElement('div');
+      lbl.classList.add('row-label');
+      lbl.innerText = text;
+      return lbl;
+    }
+
+    function createSeatElement(row, number) {
+      const seatCode = `${row}${number}`;
+      const seat = document.createElement('div');
+      seat.classList.add('kursi');
+      if (row === 'D') seat.classList.add('extra');
+      
+      if (row === 'E') {
+        seat.classList.add('comfort');
+        if (number >= 7 && number <= 10) {
+          seat.style.width = '58px';
+        } else if (number === 6) {
+          seat.style.width = '42px';
+        } else if (number === 5) {
+          seat.style.width = '50px';
+        } else if (number === 4) {
+          seat.style.width = '50px';
+        } else if (number === 3) {
+          seat.style.width = '48px';
+          seat.style.marginRight = '28px';
+        } else if (number === 2) {
+          seat.style.width = '42px';
+        } else if (number === 1) {
+          seat.style.width = '38px';
+        }
+      }
+
+      seat.dataset.code = seatCode;
+      seat.innerHTML = `<div class="kursi-nomor">${number}</div><div class="kursi-nama"></div>`;
+
+      // Customer hanya bisa klik untuk melihat info, tidak bisa mengubah data
+      seat.addEventListener('click', () => handleCustomerClick(seatCode));
+      return seat;
+    }
+
+    function buildLayout() {
+      cinemaContainer.innerHTML = '';
+      
+      // BARIS A
+      const rowA = document.createElement('div');
+      rowA.classList.add('row');
+      rowA.appendChild(createLabel('A'));
+      
+      const blockA_left = document.createElement('div');
+      blockA_left.classList.add('block');
+      for(let i = 21; i >= 15; i--) { blockA_left.appendChild(createSeatElement('A', i)); }
+      rowA.appendChild(blockA_left);
+
+      const blockA_middle = document.createElement('div');
+      blockA_middle.classList.add('block');
+      for(let i = 14; i >= 13; i--) { blockA_middle.appendChild(createSeatElement('A', i)); }
+      rowA.appendChild(blockA_middle);
+
+      const blockA_right = document.createElement('div');
+      blockA_right.classList.add('block');
+      for(let i = 12; i >= 1; i--) { blockA_right.appendChild(createSeatElement('A', i)); }
+      rowA.appendChild(blockA_right);
+
+      rowA.style.marginLeft = "-69px";
+      rowA.appendChild(createLabel('A'));
+      cinemaContainer.appendChild(rowA);
+
+      // LAYOUT UTAMA B sampai L
+      const mainLayout = document.createElement('div');
+      mainLayout.classList.add('main-layout');
+
+      // 1. Label Kiri
+      const leftLabels = document.createElement('div');
+      leftLabels.classList.add('grid-rows');
+      upperRows.forEach(r => leftLabels.appendChild(createLabel(r)));
+
+      // 2. Blok Kiri Kursi
+      const midBlock1 = document.createElement('div');
+      midBlock1.classList.add('grid-rows');
+      upperRows.forEach(r => {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('block');
+        if (r === 'B') {
+          for(let i = 19; i >= 13; i--) { rowDiv.appendChild(createSeatElement('B', i)); }
+        } else {
+          let start = (r === 'E') ? 10 : 17;
+          let end = (r === 'E') ? 7 : 11;
+          for(let i = start; i >= end; i--) { rowDiv.appendChild(createSeatElement(r, i)); }
+        }
+        midBlock1.appendChild(rowDiv);
+      });
+
+      // 3. STAIRS di tengah
+      const stairsBox = document.createElement('div');
+      stairsBox.classList.add('stairs-box');
+      stairsBox.innerHTML = '<span class="vertical-text">STAIRS</span>';
+
+      // 4. Blok Kanan Kursi
+      const midBlock2 = document.createElement('div');
+      midBlock2.classList.add('grid-rows');
+      upperRows.forEach(r => {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('block');
+        if (r === 'B') {
+          for(let i = 12; i >= 1; i--) { rowDiv.appendChild(createSeatElement('B', i)); }
+        } else if (r === 'E') {
+          for(let i = 6; i >= 1; i--) {
+            if (i === 3) {
+              const emptySpace = document.createElement('div');
+              emptySpace.style.width = '32px';
+              emptySpace.style.height = '38px';
+              rowDiv.appendChild(emptySpace);
+            }
+            rowDiv.appendChild(createSeatElement('E', i));
+          }
+        } else {
+          for(let i = 10; i >= 1; i--) { rowDiv.appendChild(createSeatElement(r, i)); }
+        }
+        midBlock2.appendChild(rowDiv);
+      });
+
+      // 5. Bagian Kanan Luar (Entrance & Label)
+      const rightWrapper = document.createElement('div');
+      rightWrapper.style.display = 'flex';
+      rightWrapper.style.flexDirection = 'column';
+      rightWrapper.style.gap = '4px';
+
+      const lblB = document.createElement('div');
+      lblB.classList.add('row-label');
+      lblB.innerText = 'B';
+      rightWrapper.appendChild(lblB);
+
+      const clContainer = document.createElement('div');
+      clContainer.style.display = 'flex';
+      clContainer.style.gap = '4px';
+      clContainer.style.alignItems = 'stretch';
+
+      const entranceBox = document.createElement('div');
+      entranceBox.classList.add('entrance-box');
+      entranceBox.innerHTML = '<span class="vertical-text">ENTRANCE</span>';
+
+      const clLabels = document.createElement('div');
+      clLabels.classList.add('grid-rows');
+      clLabels.style.position = 'relative';
+      clLabels.style.left = '-66px';
+      clRows.forEach(r => clLabels.appendChild(createLabel(r)));
+
+      clContainer.appendChild(entranceBox);
+      clContainer.appendChild(clLabels);
+      rightWrapper.appendChild(clContainer);
+
+      mainLayout.append(leftLabels, midBlock1, stairsBox, midBlock2, rightWrapper);
+      cinemaContainer.appendChild(mainLayout);
+    }
+
+    function handleCustomerClick(seatCode) {
+      const currentSeatRef = ref(db, `cinema1/seats/${seatCode}`);
+      onValue(currentSeatRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.nama) {
+          const status = (data.statusBayar === 'LUNAS') ? '✅ LUNAS' : '⏳ PENDING';
+          alert(`Kursi ${seatCode}:\n- Pemesan: ${data.nama}\n- Status Pembayaran: ${status}`);
+        } else {
+          alert(`Kursi ${seatCode} masih TERSEDIA.`);
+        }
+      }, { onlyOnce: true });
+    }
+
+    buildLayout();
+
+    // Sinkronisasi data real-time dengan database cinema1/seats
+    onValue(seatsRef, (snapshot) => {
+      const occupiedSeatsData = snapshot.val() || {};
+      
+      document.querySelectorAll('.kursi').forEach(seat => {
+        const code = seat.dataset.code;
+        const number = code.replace(/^[A-Z]+/, '');
+        const data = occupiedSeatsData[code];
+
+        if (data) {
+          seat.classList.add('occupied');
+          const namaPemesan = (typeof data === 'object' && data.nama) ? data.nama : '';
+          seat.innerHTML = `<div class="kursi-nomor">${number}</div><div class="kursi-nama">${namaPemesan}</div>`;
+        } else {
+          seat.classList.remove('occupied');
+          seat.innerHTML = `<div class="kursi-nomor">${number}</div>`;
+        }
+      });
+
+      const tbody = document.getElementById('tabelRekapBody');
+      tbody.innerHTML = '';
+      const seatCodes = Object.keys(occupiedSeatsData).sort();
+
+      if (seatCodes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #aaa;">Belum ada kursi terisi</td></tr>';
+        return;
+      }
+
+      const groupedData = {};
+      seatCodes.forEach(code => {
+        const data = occupiedSeatsData[code];
+        const nama = (typeof data === 'object' && data.nama && data.nama.trim() !== '') ? data.nama.trim() : 'Tanpa Nama';
+        const status = (typeof data === 'object' && data.statusBayar) ? data.statusBayar : 'PENDING';
+        
+        const key = `${nama.toLowerCase()}_${status}`;
+        if (!groupedData[key]) {
+          groupedData[key] = { nama: nama, status: status, seats: [] };
+        }
+        groupedData[key].seats.push(code);
+      });
+
+      Object.keys(groupedData).forEach(key => {
+        const item = groupedData[key];
+        const kursiList = item.seats.join(', ');
+        const isLunas = item.status === 'LUNAS';
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: bold; text-align: center;">${kursiList}</td>
+          <td style="font-weight: bold; text-align: left;">${item.nama}</td>
+          <td style="font-weight: bold; color: ${isLunas ? '#2ecc71' : '#e67e22'};">
+            ${isLunas ? '✅ LUNAS' : '⏳ PENDING'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>
